@@ -2,12 +2,11 @@ package com.office.library.admin.member;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/member")
@@ -78,5 +77,28 @@ public class AdminMemberController {
 		if (result <= 0) nextPage = "admin/member/create_account_ng";
 		
 		return nextPage;
-	}	
+	}
+
+	@RequestMapping(value = "/listupAdmin", method = RequestMethod.GET)
+	public String listupAdmin(Model model) {
+		System.out.println("[AdminMemberController] listupAdmin()");
+
+		String nextPage = "admin/member/listup_admins";
+		List<AdminMemberVo> adminMemberVos = adminMemberService.listupAdmin();
+
+		model.addAttribute("adminMemberVos", adminMemberVos);
+
+		return nextPage;
+	}
+
+	@RequestMapping(value = "/setAdminApproval", method = RequestMethod.GET)
+	public String setAdminApproval(@RequestParam("a_m_no") int a_m_no) {
+		System.out.println("[AdminMemberController] setAdmminApproval()");
+
+		String nextPage = "redirect:/admin/member/listupAdmin";
+
+		adminMemberService.setAdminApproval(a_m_no);
+
+		return nextPage;
+	}
 }
