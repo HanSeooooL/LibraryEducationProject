@@ -1,10 +1,14 @@
 package com.office.library.admin.member;
 
+import com.sun.net.httpserver.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin/member")
@@ -12,6 +16,46 @@ public class AdminMemberController {
 	
 	@Autowired
 	AdminMemberService adminMemberService;
+
+	//로그인
+	@GetMapping("/loginForm")
+	public String loginForm() {
+		System.out.println("[AdminMembercontroller] loginForm()");
+
+		String nextPage = "admin/member/login_form";
+
+		return nextPage;
+	}
+
+	//로그인 확인
+	@PostMapping("/loginConfirm")
+	public String loginConfirm(AdminMemberVo adminMemberVo, HttpSession session) {
+		System.out.println("[AdminMembercontroller] loginConfirm()");
+
+		String nextPage = "admin/member/login_ok";
+
+		AdminMemberVo loginedAdminMemberVo = adminMemberService.loginConfirm(adminMemberVo);
+
+		if(loginedAdminMemberVo == null) {
+			nextPage = "admin/member/login_ng";
+		} else {
+			session.setAttribute("loginedAdminMemberVo", loginedAdminMemberVo);
+			session.setMaxInactiveInterval(60 * 30);
+		}
+
+		return nextPage;
+	}
+
+	@RequestMapping(value = "/logoutConfirm", method = RequestMethod.GET)
+	public String logoutConfirm(HttpSession session) {
+		System.out.println("[AdminMembercontroller] logoutConfirm()");
+
+		String nextPage = "redirect:/admin";
+
+		session.invalidate();
+
+		return nextPage;
+	}
 	
 	//회원가입
 	@RequestMapping(value = "/createAccountForm", method = RequestMethod.GET)
